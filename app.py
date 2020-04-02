@@ -6,13 +6,14 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def main():
     
     app = Tk()
     app.title("Coronavirus statistics")
-    app.geometry("1000x500")
+    app.geometry("1000x530")
     frame= Frame(app)
     frame.grid()
     grid = Frame(frame)
@@ -72,9 +73,17 @@ def main():
 
         # Creating plot
         fig = Figure(figsize=(10,5), dpi=100)
-        fig.add_subplot(111).plot(result["Date"], result[currentTypeOfData.get()])
-        fig.autofmt_xdate()
-        fig.suptitle(currentCountry.get() + " - " + currentTypeOfData.get())
+        ax = fig.subplots()
+
+        # Displaying every bar label
+        ax.bar(result["Date"], result[currentTypeOfData.get()])
+        ax.set_title(currentCountry.get() + " - " + currentTypeOfData.get())
+        ax.set_xticks(result["Date"])
+        ax.tick_params(labelrotation=90)
+        fig.tight_layout()
+        
+        
+        
 
         # Putting plot to TkInter
         canvas = FigureCanvasTkAgg(fig, master=app)
