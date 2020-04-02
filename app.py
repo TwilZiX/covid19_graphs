@@ -1,12 +1,22 @@
 import urllib.request, json
 import pandas as pd
 from tkinter import *
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 
 def main():
-
+    
     app = Tk()
     app.title("Coronavirus statistics")
+    app.geometry("1000x500")
+    frame= Frame(app)
+    frame.grid()
+    grid = Frame(frame)
+    grid.grid(sticky=N+S+E+W)
 
     # Getting JSON data
     url = "https://opendata.ecdc.europa.eu/covid19/casedistribution/json/"
@@ -21,7 +31,7 @@ def main():
 
     # Adding records to data / COUNTRIES
     for row in jsonData["records"]:
-        
+
         # Converting to rrrrmmdd so it can be changed to pandas date
         date = str(row["dateRep"][6:] + row["dateRep"][3:5] + row["dateRep"][:2])
 
@@ -55,9 +65,27 @@ def main():
     typeOfDataLabel = Label(app, text="Choose type of data").grid(row=0, column=2)
     typeOfDataMenu = OptionMenu(app, currentTypeOfData, *TYPEOFDATA).grid(row=0, column=3)
 
-    # Limiting DataFrame based on user choice
-    result = df[["Date", currentTypeOfData.get()]].loc[df["Country"] == currentCountry.get()]
-    print(result.head(10))
+    # Function for displaying plot with current user choices
+    def showPlot():
+        # Limiting DataFrame based on user choice
+        result = df[["Date", currentTypeOfData.get()]].loc[df["Country"] == currentCountry.get()]
+
+        # Creating plot
+        fig = Figure(figsize=(10,5), dpi=100)
+        fig.add_subplot(111).plot(result["Date"], result[currentTypeOfData.get()])
+        fig.autofmt_xdate()
+        fig.suptitle(currentCountry.get() + " - " + currentTypeOfData.get())
+
+        # Putting plot to TkInter
+        canvas = FigureCanvasTkAgg(fig, master=app)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=0, columnspan=5)
+
+    # Displaying plot even before pushing button
+    showPlot()
+
+    #Generate button
+    generateButton = Button(text="Generate", command=showPlot).grid(row=0, column=4)
 
     app.mainloop()
 
