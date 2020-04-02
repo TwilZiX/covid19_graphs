@@ -6,7 +6,6 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 def main():
@@ -68,8 +67,8 @@ def main():
 
     # Function for displaying plot with current user choices
     def showPlot():
-        # Limiting DataFrame based on user choice
-        result = df[["Date", currentTypeOfData.get()]].loc[df["Country"] == currentCountry.get()]
+        # Limiting DataFrame based on user choice, max 45 days from now
+        result = df[["Date", currentTypeOfData.get()]].loc[df["Country"] == currentCountry.get()].head(45)
 
         # Creating plot
         fig = Figure(figsize=(10,5), dpi=100)
@@ -81,9 +80,6 @@ def main():
         ax.set_xticks(result["Date"])
         ax.tick_params(labelrotation=90)
         fig.tight_layout()
-        
-        
-        
 
         # Putting plot to TkInter
         canvas = FigureCanvasTkAgg(fig, master=app)
